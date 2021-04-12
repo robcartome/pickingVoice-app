@@ -65,7 +65,7 @@ export default function ItemPedido(props) {
       }
   }
 
-  /* let rec;
+/*   let rec;
 if(!("webkitSpeechRecognition" in window)){
   alert("disclapa, no puede usar la API")
 } else {
@@ -74,8 +74,8 @@ if(!("webkitSpeechRecognition" in window)){
   rec.continous = true;
   rec.interim = true;
   rec.addEventListener("result",iniciar);
-} */
-  /* function iniciar(event){
+}
+  function iniciar(event){
   for (let i = event.resultIndex; i< event.results.length; i++){
     console.log= event.result[i][0].transcript;
   }
