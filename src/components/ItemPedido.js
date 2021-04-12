@@ -60,6 +60,22 @@ export default function ItemPedido(props) {
       }
   }
 
+/* let rec;
+if(!("webkitSpeechRecognition" in window)){
+  alert("disclapa, no puede usar la API")
+} else {
+  rec = new webkitSpeechRecognition();
+  rec.lang="es-ES",
+  rec.continous = true;
+  rec.interim = true;
+  rec.addEventListener("result",iniciar);
+} */
+
+function iniciar(event){
+  for (let i = event.resultIndex; i< event.results.length; i++){
+    console.log= event.result[i][0].transcript;
+  }
+}
   /*  */
   return (
     <ProductoItem>
@@ -72,7 +88,8 @@ export default function ItemPedido(props) {
             <h3>PDO: 163268 (2/5)</h3>
           </div>
           <ButtonVoice
-            onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])}
+            /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
+            onClick={(e)=>iniciar()}
           >
             <img src={iconVoice} />
           </ButtonVoice>
