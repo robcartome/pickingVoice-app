@@ -1,10 +1,22 @@
 import ItemPedido from "../components/ItemPedido";
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
+import OrdersService from "../services/orders_service";
 
 export default function Orders() {
   const [statePedido, setStatePedido] = useState(0);
+  const [orders, setOrders] = useState([]);
 
+  useEffect(() => {
+    async function fetchOrders() {
+      const ordersService = new OrdersService();
+      const orders = await ordersService.list();
+      setOrders(orders);
+    }
+    fetchOrders();
+  }, []);
+
+  // console.log(orders);
   const data = [
     {
       id: 1,
@@ -40,13 +52,14 @@ export default function Orders() {
             <h5>Estado</h5>
           </div>
         </ItemPedido>
-        {data.map((pedido) => {
+        
+        {orders.map((pedido) => {
           return (
             <ItemPedido
               key={pedido.id}
               id={pedido.id}
-              cod={pedido.codPdo}
-              cliente={pedido.cliente}
+              cod={pedido.numPdo}
+              cliente={pedido.nomCliente}
               estado={pedido.estado}
             />
           );
