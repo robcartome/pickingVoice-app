@@ -12,12 +12,27 @@ OrdersService.prototype.list = () =>
     method: "GET",
   });
 
-  OrdersService.prototype.update = (idPdo, idItem, done) =>
+  OrdersService.prototype.show = (idPdo) =>
+  apiFetch(`${BASE_URL}/pedido/${idPdo}`, {
+    method: "GET",
+  });
+
+  OrdersService.prototype.updateItem = (idPdo, idItem, done) =>
   apiFetch(`${BASE_URL}/pedido/${idPdo}/item/${idItem}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ done }),
+  });
+
+  OrdersService.prototype.checkStatePedido = (idPdo) =>
+  apiFetch(`${BASE_URL}/pedido/${idPdo}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // body: JSON.stringify({ done }),
+    // rsp { "estado": true }
   });
 export default OrdersService;
