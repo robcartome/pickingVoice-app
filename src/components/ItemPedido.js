@@ -1,6 +1,11 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
 import iconVoice from "../assets/voice.svg";
+import iconPlay from "../assets/play.svg";
+
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 export default function ItemPedido(props) {
   const [isOpened, setIsOpened] = useState(false);
@@ -32,16 +37,16 @@ export default function ItemPedido(props) {
     let speech;
     let msgIntro;
 
-    switch(type){
+    switch (type) {
       case "ubicar":
         msgIntro = "Ubicar: ";
-      break;
+        break;
       case "cantidad":
         msgIntro = "Cantidad: ";
-      break;
+        break;
       case "completo":
         msgIntro = "Completado Siguiente";
-      break;
+        break;
     }
 
     speech = new SpeechSynthesisUtterance(msgIntro);
@@ -60,7 +65,7 @@ export default function ItemPedido(props) {
       }
   }
 
-/* let rec;
+  /* let rec;
 if(!("webkitSpeechRecognition" in window)){
   alert("disclapa, no puede usar la API")
 } else {
@@ -70,12 +75,34 @@ if(!("webkitSpeechRecognition" in window)){
   rec.interim = true;
   rec.addEventListener("result",iniciar);
 } */
-
-function iniciar(event){
+  /* function iniciar(event){
   for (let i = event.resultIndex; i< event.results.length; i++){
     console.log= event.result[i][0].transcript;
   }
-}
+} */
+
+  const {
+    transcript,
+    interimTranscript,
+    finalTranscript,
+    resetTranscript,
+    listening,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  if (!browserSupportsSpeechRecognition) {
+    console.log("Speech no es compatible");
+  }
+
+  const start = () => {
+    SpeechRecognition.startListening({
+      continuous: false,
+      language: "es-PE",
+    });
+    console.log(transcript)
+  }
+    
+
   /*  */
   return (
     <ProductoItem>
@@ -87,12 +114,21 @@ function iniciar(event){
             <h4>Picking Voice</h4>
             <h3>PDO: 163268 (2/5)</h3>
           </div>
-          <ButtonVoice
-            /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
-            onClick={(e)=>iniciar()}
-          >
-            <img src={iconVoice} />
-          </ButtonVoice>
+          <div>
+            <ButtonVoice
+              /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
+              onClick={(e) => start()}
+            >
+              <img src={iconPlay} />
+            </ButtonVoice>
+            <ButtonVoice
+              /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
+              onClick={(e) => start()}
+            >
+              <img src={iconVoice} />
+            </ButtonVoice>
+          </div>
+          <p>{transcript}</p> {/* Para mostrar lo que hable */}
           <p>Ubicacion Almacen</p>
           <MapWrapper>Mapa</MapWrapper>
           <button className="button--cancel" onClick={(e) => showModal()}>
@@ -174,15 +210,15 @@ const ButtonVoice = styled.button`
   width: 60px;
   height: 60px;
   margin: 5px;
-  padding-right: 8px;
+  padding: 8px;
   border: 2px solid #4b9460;
   box-sizing: border-box;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   outline: none;
+  cursor: pointer;
   :active {
     background-color: rgb(153, 255, 204, 0.9);
   }

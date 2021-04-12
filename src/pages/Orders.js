@@ -26,7 +26,7 @@ export default function Orders() {
     },
   ];
   return (
-    <div>
+    <StyleDiv>
       <h1>Pedidos</h1>
       <List>
         <ItemPedido type={"header"}>
@@ -52,9 +52,13 @@ export default function Orders() {
           );
         })}
       </List>
-    </div>
+    </StyleDiv>
   );
 }
+
+const StyleDiv = styled.div`
+  text-align: center;
+`
 
 const List = styled.ul`
   margin-right: 10%;
