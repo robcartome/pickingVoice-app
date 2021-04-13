@@ -6,11 +6,10 @@ App Para interactuar con una API de picking. (JSON)
 - Al hacer Clic en Play nos indica la ubicación de un producto 
 - Al hacer click nuevamente en play nos indica la ubicación del siguiente producto
 
-La url se encuentra (BASE_URL) services/api_fetch
 cod de la API: https://github.com/robcartome/pickingVoice-API
 
-Hooks of React para la voz:
-"react-speech-recognition"
+- La url se encuentra en services/api_fetch
+- Hooks of React para la voz: "react-speech-recognition"
 
 # Getting Started with Create React App
 
