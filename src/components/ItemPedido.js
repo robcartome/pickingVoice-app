@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import iconVoice from "../assets/voice.svg";
 import iconPlay from "../assets/play.svg";
 import OrdersService from "../services/orders_service";
-
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -11,7 +10,9 @@ import SpeechRecognition, {
 export default function ItemPedido(props) {
   const [isOpened, setIsOpened] = useState(false);
   const [order, setOrder] = useState([]);
-
+  const [item, setItem]= useState(0);
+  let totalProductos = order.length;
+  
   /* Para traer el Pedido seleccionado */
   useEffect(() => {
     async function fetchOrders() {
@@ -28,23 +29,40 @@ export default function ItemPedido(props) {
     resetTranscript();
   };
 
-  function leerProducto(){
-    const producto = order[0].nomProducto;
-    // activeVoice("ubicar",producto);
-    activeVoice("ubicar", [{ rack: 1, "": "B", nivel: 3 }])
+  function readProducto() {
+    activeVoice(
+      `ubicar`,
+      order[item]
+        ? [
+            {
+              producto: order[item].nomProducto,
+              rack: order[item].numRack,
+              posicion: order[item].posicion,
+              nivel: order[item].numNivel,
+            },
+          ]
+        : [{ ubicacion: "No Hay" }]
+    );
+
+    const i = item +1;
+    setItem(i);
+    if(totalProductos==item){
+      setItem(0);
+      alert("Pedido Completado")
+    }
   }
 
-    // Verificaremos si es el codigo correcto
-    function confirmCodeProducto() {
-      const code = finalTranscript;
-      // console.log(code);
-      order.forEach((element)=>{
-        if (element.codProducto == code) {
-          console.log(code, "Correcto");
-          resetTranscript();
-        }
-      });
-    }
+  // Verificaremos si es el codigo correcto
+  function confirmCodeProducto() {
+    const code = finalTranscript;
+    // console.log(code);
+    order.forEach((element) => {
+      if (element.codProducto == code) {
+        console.log(code, "Correcto");
+        resetTranscript();
+      }
+    });
+  }
 
   /* Pasar Texto A Voz  */
   function activeVoice(type, data) {
@@ -53,7 +71,7 @@ export default function ItemPedido(props) {
 
     switch (type) {
       case "ubicar":
-        msgIntro = "Ubicar Producto: ";
+        msgIntro = "Ubicar: ";
         break;
       case "cantidad":
         msgIntro = "Cantidad: ";
@@ -103,20 +121,17 @@ export default function ItemPedido(props) {
   };
 
   const listenCodProducto = () => {
-    // resetTranscript();
     start();
     setTimeout(() => {
       // alert(transcript);
       SpeechRecognition.stopListening();
       SpeechRecognition.abortListening();
       console.log("Apagar micro");
-      // console.log("ft",finalTranscript)
-      //confirmCodeProducto(transcript)
     }, 3500);
   };
-  /*  */
+  /* Fin Pasar Voz a Texto */
 
-
+  /* Controlar mostrar Header o Items*/
   const showButton =
     props.type == "header" ? (
       <div></div>
@@ -129,7 +144,7 @@ export default function ItemPedido(props) {
           <p>{props.cliente}</p>
         </div>
         <div>
-          <p>{props.estado==0?"Falta":(<b>Listo</b>)}</p>
+          <p>{props.estado == 0 ? "Falta" : <b>Listo</b>}</p>
         </div>
         <button onClick={(e) => showModal()}>show</button>
       </>
@@ -143,23 +158,24 @@ export default function ItemPedido(props) {
         <ModalWrapper>
           <div>
             <h4>Picking Voice</h4>
-            <h3>PDO: {props.cod} (1/{order.length})</h3>
+            <h3>
+              PDO: {props.cod} ({item}/{totalProductos})
+            </h3>
+            <p> Escuchar y Responder</p>
           </div>
           <div>
-            <ButtonVoice
-              onClick={(e) =>
-                activeVoice("ubicar", [{ rack: 1, "": "B", nivel: 3 }])
-              }
-            >
+            <ButtonVoice onClick={(e) => readProducto()}>
               <img src={iconPlay} />
             </ButtonVoice>
+            
             <ButtonVoice onClick={(e) => listenCodProducto()}>
               <img src={iconVoice} />
             </ButtonVoice>
+            
           </div>
-          <p>{transcript} | Cod. Producto: {confirmCodeProducto()}</p>{" "}
-          {/* envia la transmisión final */}
-          <p>Ubicacion Almacen</p>
+          <p>
+            { transcript } | Cod. Producto: {finalTranscript}
+          </p>
           <MapWrapper>Mapa</MapWrapper>
           <button className="button--cancel" onClick={(e) => showModal()}>
             CANCEL
@@ -170,6 +186,9 @@ export default function ItemPedido(props) {
   );
 }
 
+/**
+ * Styles Components
+ */
 const ProductoItem = styled.li`
   background: #ffffff;
   box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.03);
