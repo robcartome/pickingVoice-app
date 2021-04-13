@@ -191,7 +191,7 @@ export default function ItemPedido(props) {
           </p>
           <MapWrapper>
             Mapa - Ubicacion:
-            <h4>Producto:{dataProducto.producto} </h4>
+            <h4>Producto : {dataProducto.producto} </h4>
             <h5>Rack : {dataProducto.rack}</h5>
             <h5>Posicion: {dataProducto.posicion}</h5>
             <h5>Nivel : {dataProducto.nivel}</h5>
