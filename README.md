@@ -1,5 +1,17 @@
 # Picking Voice App
 
+App Para interactuar con una API de picking. (JSON)
+- Muestra una lista de pedidos que recibe de la API.
+- Al hacer click en Show Se Muestra el pedido seleccionado.
+- Al hacer Clic en Play nos indica la ubicación de un producto 
+- Al hacer click nuevamente en play nos indica la ubicación del siguiente producto
+
+La url se encuentra (BASE_URL) services/api_fetch
+cod de la API: https://github.com/robcartome/pickingVoice-API
+
+Hooks of React para la voz:
+"react-speech-recognition"
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
