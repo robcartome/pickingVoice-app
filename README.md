@@ -8,7 +8,7 @@ App Para interactuar con una API de picking. (JSON)
 
 code de la API: https://github.com/robcartome/pickingVoice-API
 
-- La url se encuentra en services/api_fetch
+- La url se encuentra en services/api_fetch | se hizo deployment en servidor local
 - Hooks of React para la voz: "react-speech-recognition"
 
 # Getting Started with Create React App
