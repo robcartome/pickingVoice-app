@@ -10,9 +10,9 @@ import SpeechRecognition, {
 export default function ItemPedido(props) {
   const [isOpened, setIsOpened] = useState(false);
   const [order, setOrder] = useState([]);
-  const [item, setItem]= useState(0);
+  const [item, setItem] = useState(0);
+  const [dataProducto, setDataProducto] = useState({});
   let totalProductos = order.length;
-  
   /* Para traer el Pedido seleccionado */
   useEffect(() => {
     async function fetchOrders() {
@@ -27,35 +27,50 @@ export default function ItemPedido(props) {
     setIsOpened(!isOpened);
     console.log(isOpened);
     resetTranscript();
+    setDataProducto({});
+    setItem(0);
   };
 
+  // Lee datos Producto por Producto que sigue
   function readProducto() {
-    activeVoice(
-      `ubicar`,
-      order[item]
-        ? [
-            {
-              producto: order[item].nomProducto,
-              rack: order[item].numRack,
-              posicion: order[item].posicion,
-              nivel: order[item].numNivel,
-            },
-          ]
-        : [{ ubicacion: "No Hay" }]
-    );
-
-    const i = item +1;
-    setItem(i);
-    if(totalProductos==item){
+    const data = order[item]
+      ? {
+          codProd: order[item].codProducto,
+          producto: order[item].nomProducto,
+          rack: order[item].numRack,
+          posicion: order[item].posicion,
+          nivel: order[item].numNivel,
+          estado: order[item].estado,
+        }
+      : "";
+    const ubicacion = {
+      producto: data.producto,
+      rack: data.rack,
+      posicion: data.posicion,
+      nivel: data.nivel,
+    };
+    let i = 0;
+    if (data.estado == 0) {
+      activeVoice(`ubicar`, [ubicacion] || [{ producto: "No Hay" }]);
+      setDataProducto(data);
+      i = item + 1;
+      setItem(i);
+    } else {
+      activeVoice(`completo`, [{ "": "" }]);
+      i = item + 1;
+      setItem(i);
+      //setItem(totalProductos);
+    }
+    if (totalProductos == item) {
       setItem(0);
-      alert("Pedido Completado")
+      activeVoice(`completo`, [{ Pedido: "" }]);
+      alert("Pedido Completado");
     }
   }
 
-  // Verificaremos si es el codigo correcto
+  // Verificaremos si es el codigo Producto es correcto
   function confirmCodeProducto() {
     const code = finalTranscript;
-    // console.log(code);
     order.forEach((element) => {
       if (element.codProducto == code) {
         console.log(code, "Correcto");
@@ -123,7 +138,6 @@ export default function ItemPedido(props) {
   const listenCodProducto = () => {
     start();
     setTimeout(() => {
-      // alert(transcript);
       SpeechRecognition.stopListening();
       SpeechRecognition.abortListening();
       console.log("Apagar micro");
@@ -131,7 +145,7 @@ export default function ItemPedido(props) {
   };
   /* Fin Pasar Voz a Texto */
 
-  /* Controlar mostrar Header o Items*/
+  /* Controla: mostrar Header o Items de la Tabla*/
   const showButton =
     props.type == "header" ? (
       <div></div>
@@ -167,16 +181,21 @@ export default function ItemPedido(props) {
             <ButtonVoice onClick={(e) => readProducto()}>
               <img src={iconPlay} />
             </ButtonVoice>
-            
+
             <ButtonVoice onClick={(e) => listenCodProducto()}>
               <img src={iconVoice} />
             </ButtonVoice>
-            
           </div>
           <p>
-            { transcript } | Cod. Producto: {finalTranscript}
+            {transcript} | Cod. Producto: {finalTranscript}
           </p>
-          <MapWrapper>Mapa</MapWrapper>
+          <MapWrapper>
+            Mapa - Ubicacion:
+            <h4>Producto:{dataProducto.producto} </h4>
+            <h5>Rack : {dataProducto.rack}</h5>
+            <h5>Posicion: {dataProducto.posicion}</h5>
+            <h5>Nivel : {dataProducto.nivel}</h5>
+          </MapWrapper>
           <button className="button--cancel" onClick={(e) => showModal()}>
             CANCEL
           </button>
