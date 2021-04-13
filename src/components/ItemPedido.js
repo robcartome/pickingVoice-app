@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import iconVoice from "../assets/voice.svg";
 import iconPlay from "../assets/play.svg";
+import OrdersService from "../services/orders_service";
 
 import SpeechRecognition, {
   useSpeechRecognition,
@@ -9,37 +10,50 @@ import SpeechRecognition, {
 
 export default function ItemPedido(props) {
   const [isOpened, setIsOpened] = useState(false);
+  const [order, setOrder] = useState([]);
+
+  /* Para traer el Pedido seleccionado */
+  useEffect(() => {
+    async function fetchOrders() {
+      const ordersService = new OrdersService();
+      const order = await ordersService.showOrder(props.id);
+      setOrder(order);
+    }
+    fetchOrders();
+  }, []);
+
   const showModal = () => {
     setIsOpened(!isOpened);
     console.log(isOpened);
+    resetTranscript();
   };
 
-  const showButton =
-    props.type == "header" ? (
-      <div></div>
-    ) : (
-      <>
-        <div>
-          <p>{props.cod}</p>
-        </div>
-        <div>
-          <p>{props.cliente}</p>
-        </div>
-        <div>
-          <p>{props.estado}</p>
-        </div>
-        <button onClick={(e) => showModal()}>show</button>
-      </>
-    );
-  /*  */
+  function leerProducto(){
+    const producto = order[0].nomProducto;
+    // activeVoice("ubicar",producto);
+    activeVoice("ubicar", [{ rack: 1, "": "B", nivel: 3 }])
+  }
 
+    // Verificaremos si es el codigo correcto
+    function confirmCodeProducto() {
+      const code = finalTranscript;
+      // console.log(code);
+      order.forEach((element)=>{
+        if (element.codProducto == code) {
+          console.log(code, "Correcto");
+          resetTranscript();
+        }
+      });
+    }
+
+  /* Pasar Texto A Voz  */
   function activeVoice(type, data) {
     let speech;
     let msgIntro;
 
     switch (type) {
       case "ubicar":
-        msgIntro = "Ubicar: ";
+        msgIntro = "Ubicar Producto: ";
         break;
       case "cantidad":
         msgIntro = "Cantidad: ";
@@ -51,36 +65,23 @@ export default function ItemPedido(props) {
 
     speech = new SpeechSynthesisUtterance(msgIntro);
     speech.lang = "es-ES";
-    speech.rate = 0.9;
+    speech.rate = 1;
     window.speechSynthesis.speak(speech);
     for (let indice = 0; indice < data.length; indice++)
       for (let [key, value] of Object.entries(data[indice])) {
         speech = new SpeechSynthesisUtterance(key);
         speech.lang = "es-ES";
         speech.volume = 1;
+        speech.rate = 1;
         window.speechSynthesis.speak(speech);
         speech = new SpeechSynthesisUtterance(value);
         speech.lang = "es-ES";
+        speech.rate = 1;
         window.speechSynthesis.speak(speech);
       }
   }
 
-/*   let rec;
-if(!("webkitSpeechRecognition" in window)){
-  alert("disclapa, no puede usar la API")
-} else {
-  rec = new webkitSpeechRecognition();
-  rec.lang="es-ES",
-  rec.continous = true;
-  rec.interim = true;
-  rec.addEventListener("result",iniciar);
-}
-  function iniciar(event){
-  for (let i = event.resultIndex; i< event.results.length; i++){
-    console.log= event.result[i][0].transcript;
-  }
-} */
-
+  /* Pasar Voz a Texto  */
   const {
     transcript,
     interimTranscript,
@@ -99,11 +100,41 @@ if(!("webkitSpeechRecognition" in window)){
       continuous: false,
       language: "es-PE",
     });
-    console.log(transcript)
-  }
-    
+  };
 
+  const listenCodProducto = () => {
+    // resetTranscript();
+    start();
+    setTimeout(() => {
+      // alert(transcript);
+      SpeechRecognition.stopListening();
+      SpeechRecognition.abortListening();
+      console.log("Apagar micro");
+      // console.log("ft",finalTranscript)
+      //confirmCodeProducto(transcript)
+    }, 3500);
+  };
   /*  */
+
+
+  const showButton =
+    props.type == "header" ? (
+      <div></div>
+    ) : (
+      <>
+        <div>
+          <p>{props.cod}</p>
+        </div>
+        <div>
+          <p>{props.cliente}</p>
+        </div>
+        <div>
+          <p>{props.estado==0?"Falta":(<b>Listo</b>)}</p>
+        </div>
+        <button onClick={(e) => showModal()}>show</button>
+      </>
+    );
+
   return (
     <ProductoItem>
       {props.children}
@@ -112,23 +143,22 @@ if(!("webkitSpeechRecognition" in window)){
         <ModalWrapper>
           <div>
             <h4>Picking Voice</h4>
-            <h3>PDO: 163268 (2/5)</h3>
+            <h3>PDO: {props.cod} (1/{order.length})</h3>
           </div>
           <div>
             <ButtonVoice
-              /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
-              onClick={(e) => start()}
+              onClick={(e) =>
+                activeVoice("ubicar", [{ rack: 1, "": "B", nivel: 3 }])
+              }
             >
               <img src={iconPlay} />
             </ButtonVoice>
-            <ButtonVoice
-              /* onClick={(e) => activeVoice("completo",[{ rack: 1, "": "B", nivel: 3 }])} */
-              onClick={(e) => start()}
-            >
+            <ButtonVoice onClick={(e) => listenCodProducto()}>
               <img src={iconVoice} />
             </ButtonVoice>
           </div>
-          <p>{transcript}</p> {/* Para mostrar lo que hable */}
+          <p>{transcript} | Cod. Producto: {confirmCodeProducto()}</p>{" "}
+          {/* envia la transmisión final */}
           <p>Ubicacion Almacen</p>
           <MapWrapper>Mapa</MapWrapper>
           <button className="button--cancel" onClick={(e) => showModal()}>

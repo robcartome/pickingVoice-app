@@ -12,7 +12,7 @@ OrdersService.prototype.list = () =>
     method: "GET",
   });
 
-  OrdersService.prototype.show = (idPdo) =>
+  OrdersService.prototype.showOrder = (idPdo) =>
   apiFetch(`${BASE_URL}/pedido/${idPdo}`, {
     method: "GET",
   });
